@@ -11,6 +11,8 @@ class ChatApp extends Component {
         socket.on("chat message", (msg) => {
             console.log("message: " +  msg);
         });
+
+        socket.emit("chat message", "hello");
     }
     
     render() {
