@@ -1,0 +1,31 @@
+.message-area {
+    display: block;
+    height: 100vh;
+}
+
+.message-area-group-list {
+    display: block;
+    height: 95%;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.message-area-form {
+    height: 5%;
+    display: grid;
+    grid-template-columns: 3fr 1fr;
+}
+
+.list-group-item {
+    background-color: #36393E;
+}
+
+.message-area-form input {
+    color: black;
+    height: 100%;
+}
+
+.message-area-form button {
+    /* height: 47px; */
+    height: 100%;
+}
