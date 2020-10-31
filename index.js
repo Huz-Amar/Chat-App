@@ -3,13 +3,25 @@ const app = express();
 const http = require("http").createServer(app);
 const io = require("socket.io")(http);
 
-//* This socket connection is unique to the client that sent it. If the user reconnected, the same socket will be sent (?)
-io.on("connection", (socket) => {
+// timestamp
+function getTimeStamp() {
+    return (new Date()).getHours() + ":" + (new Date()).getMinutes();
+}
+
+// socket operations
+io.on("connection", socket => {
     console.log("a user connected");
     
-    socket.on("chat message", (msg) => {
-        console.log("message: " +  msg);
-        socket.broadcast.emit("chat message", msg);
+    socket.on("chat message", socketMsg => {
+        console.log("message: " +  socketMsg);
+        socket.broadcast.emit("chat message", {
+            chatMessage: socketMsg, timestamp: getTimeStamp()
+        });
+    });
+
+    socket.on("single timestamp", usersMessage => {
+        console.log("Single timestamp reached")
+        socket.emit("single timestamp", getTimeStamp(), usersMessage);
     });
 
     socket.on("disconnect", () => {
@@ -21,8 +33,3 @@ http.listen(5000, () => {
     console.log("listening on *:5000")
 });
 
-//------------------------
-//JSON for data transport
-// const json = {
-//     "message"
-// };

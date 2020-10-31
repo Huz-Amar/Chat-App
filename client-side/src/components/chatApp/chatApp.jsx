@@ -8,17 +8,25 @@ class ChatApp extends Component {
     constructor() {
         super();
         this.state = {
-            messages: [],
+            // array of objects of chatMessage, timestamp
+            messages: []
         }
     }
 
     componentDidMount() {
         this.socket = socketIOClient();
         
-        this.socket.on("chat message", (msg) => {
-            console.log("Message recieved: ", msg)
+        this.socket.on("chat message", socketMsg => {
+            console.log("Message recieved: ", socketMsg)
             const messageArray = this.state.messages;
-            messageArray.push(msg);
+            messageArray.push(socketMsg);
+            this.setState({messages: messageArray});
+        });
+
+        this.socket.on("single timestamp", (timeStamp, usersMessage) => {
+            console.log("Single timestamp recieved");
+            const messageArray = this.state.messages;
+            messageArray.push({chatMessage: usersMessage, timestamp: timeStamp});
             this.setState({messages: messageArray});
         });
     }
@@ -30,8 +38,10 @@ class ChatApp extends Component {
     // responsible for sending messages to server
     handleSendingMessages(message) {
         console.log("Action Recognized --> ", message)
-        if (message) 
+        if (message) {
+            this.socket.emit("single timestamp", message);
             this.socket.emit("chat message", message);
+        }
     }
     
     render() {
