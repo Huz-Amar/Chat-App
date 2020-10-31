@@ -8,7 +8,8 @@ class ChatApp extends Component {
     constructor() {
         super();
         this.state = {
-            // array of objects of chatMessage, timestamp
+            // array of objects as follows:
+            //{chatMessage, timestamp}
             messages: []
         }
     }
