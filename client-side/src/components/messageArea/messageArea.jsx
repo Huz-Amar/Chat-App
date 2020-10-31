@@ -1,25 +1,25 @@
 import React, { Component } from 'react'
 import "./messageArea.css";
+import $ from "jquery";
 
 class MessageArea extends Component {
+    getUserMessage() {
+        const userMessage = $("#user_msg").val();
+        $("#user_msg").val("");
+        return userMessage;
+    }
+
     render() { 
         return (  
             <div className="message-area"> 
                 <div className="message-area-group-list"> 
                     <ul id="list-group">
-                        <li className="list-group-item">Cras justo odio</li>
-                        <li className="list-group-item">Dapibus ac facilisis in</li>
-                        <li className="list-group-item">Morbi leo risus</li>
-                        <li className="list-group-item">Porta ac consectetur ac</li>
-                        <li className="list-group-item">Vestibulum at eros</li>
-                        <li className="list-group-item">Cras justo odio</li>
-                        <li className="list-group-item">Dapibus ac facilisis in</li>
-                        <li className="list-group-item">Morbi leo risus</li>
+                        {this.props.messages.map(message => <li key={message} className="list-group-item">{message}</li>)}
                     </ul>
                 </div>
                 <div className="message-area-form">
                     <input id="user_msg"></input>
-                    <button className="btn btn-success" id="submit">Send</button>
+                    <button className="btn btn-success" id="submit" onClick={() => this.props.onMessage(this.getUserMessage())}>Send</button>
                 </div>
             </div>
         );

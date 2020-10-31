@@ -5,20 +5,39 @@ import "./chatApp.css";
 import OnlineUsers from './../onlineUsers/onlineUsers';
 
 class ChatApp extends Component {
-    componentDidMount() {
-        const socket = socketIOClient();
-        
-        socket.on("chat message", (msg) => {
-            console.log("message: " +  msg);
-        });
+    constructor() {
+        super();
+        this.state = {
+            messages: [],
+        }
+    }
 
-        socket.emit("chat message", "hello");
+    componentDidMount() {
+        this.socket = socketIOClient();
+        
+        this.socket.on("chat message", (msg) => {
+            console.log("Message recieved: ", msg)
+            const messageArray = this.state.messages;
+            messageArray.push(msg);
+            this.setState({messages: messageArray});
+        });
+    }
+
+    componentWillUnmount() {
+        this.socket.close();
+    }
+
+    // responsible for sending messages to server
+    handleSendingMessages(message) {
+        console.log("Action Recognized --> ", message)
+        if (message) 
+            this.socket.emit("chat message", message);
     }
     
     render() {
         return (
             <div className="container">
-                <MessageArea/>
+                <MessageArea messages={this.state.messages} onMessage={(msg) => this.handleSendingMessages(msg)}/>
                 <OnlineUsers/>
             </div>
         );

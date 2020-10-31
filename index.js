@@ -12,8 +12,6 @@ io.on("connection", (socket) => {
         socket.broadcast.emit("chat message", msg);
     });
 
-    socket.emit("chat message", "connected");
-
     socket.on("disconnect", () => {
         console.log("user has disconnected");
     });
@@ -22,3 +20,9 @@ io.on("connection", (socket) => {
 http.listen(5000, () => {
     console.log("listening on *:5000")
 });
+
+//------------------------
+//JSON for data transport
+// const json = {
+//     "message"
+// };
