@@ -49,7 +49,7 @@ class ChatApp extends Component {
         this.socket.close();
     }
 
-    // filters incoming user data
+    // filters incoming user data to exclude own user entry
     filterAllUsers(allUsers) {
         return allUsers.filter(user => user.username !== this.state.username);
     }
