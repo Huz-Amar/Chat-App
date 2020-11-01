@@ -8,12 +8,12 @@ function getTimeStamp() {
     return (new Date()).getHours() + ":" + (new Date()).getMinutes();
 }
 
-// usernames. structure --> {socketRef, username}
+// usernames of all users. structure --> {socketRef, username, color}
 let allUsers = [];
 let userCount = 0;
 function getUserName(socket) {
     const username = "User" + userCount++;
-    allUsers.push({socketRef: socket, username: username});
+    allUsers.push({socketRef: socket, username: username, color: "FFFFFF"});
     console.table(allUsers);
     return username;
 }
@@ -26,10 +26,10 @@ io.on("connection", socket => {
     socket.emit("own username", getUserName(socket));
     
     // handle giving socket list of all connected users
-    socket.emit("other users' names", allUsers.map(user => user.username));
+    socket.emit("other users' names", allUsers.map(user => delete user.socketRef));
 
     // handle giving all other sockets list of all users
-    socket.broadcast.emit("other users' names", allUsers.map(user => user.username))
+    socket.broadcast.emit("other users' names", allUsers.map(user => delete user.socketRef));
 
     // handle chat messages from users
     socket.on("chat message", (socketMsg, username) => {
@@ -49,7 +49,7 @@ io.on("connection", socket => {
         console.log("user has disconnected");
         const indexToRemove = allUsers.findIndex(user => user.socketRef === socket);
         allUsers.splice(indexToRemove, 1);
-        socket.broadcast.emit("other users' names", allUsers.map(user => user.username))
+        socket.broadcast.emit("other users' names", allUsers.map(user => delete user.socketRef));
     });
 });
 

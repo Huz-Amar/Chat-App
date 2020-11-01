@@ -11,6 +11,7 @@ class ChatApp extends Component {
             // structure --> {chatMessage, timestamp, username}
             messages: [],
             username: "",
+            // structure --> {username, color}
             otherUsers: []
         }
     }
