@@ -39,7 +39,7 @@ class ChatApp extends Component {
         this.socket.on("single timestamp", (timeStamp, usersMessage) => {
             console.log("Single timestamp recieved");
             const messageArray = this.state.messages;
-            messageArray.push({chatMessage: usersMessage, timestamp: timeStamp, username: this.state.username});
+            messageArray.push({chatMessage: usersMessage, timestamp: timeStamp, username: this.state.username, color: this.state.color});
             console.log(messageArray)
             this.setState({messages: messageArray});
         });
@@ -49,7 +49,7 @@ class ChatApp extends Component {
         this.socket.close();
     }
 
-    // filters incoming user data to exclude own user entry
+    // filters incoming user data to exclude own
     filterAllUsers(allUsers) {
         return allUsers.filter(user => user.username !== this.state.username);
     }

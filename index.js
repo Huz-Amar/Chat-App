@@ -33,15 +33,15 @@ io.on("connection", socket => {
     socket.broadcast.emit("other users' names", removeSocketRefFromAllUsers());
 
     // handle chat messages from users
-    socket.on("chat message", (socketMsg, username) => {
+    socket.on("chat message", (socketMsg, username, color) => {
         console.log("message: " +  socketMsg);
         socket.broadcast.emit("chat message", {
-            chatMessage: socketMsg, timestamp: getTimeStamp(), username: username
+            chatMessage: socketMsg, timestamp: getTimeStamp(), username: username, color: color
         });
     });
 
     // handle giving user's own message a timestamp
-    socket.on("single timestamp", usersMessage => {
+    socket.on("single timestamp", (usersMessage) => {
         console.log("Single timestamp reached")
         socket.emit("single timestamp", getTimeStamp(), usersMessage);
     });
