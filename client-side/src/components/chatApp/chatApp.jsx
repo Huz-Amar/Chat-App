@@ -11,6 +11,7 @@ class ChatApp extends Component {
             // structure --> {chatMessage, timestamp, username}
             messages: [],
             username: "",
+            color: "",
             // structure --> {username, color}
             otherUsers: []
         }
@@ -19,8 +20,8 @@ class ChatApp extends Component {
     componentDidMount() {
         this.socket = socketIOClient();
 
-        this.socket.on("own username", username => {
-            this.setState({username: username});
+        this.socket.on("own username", (username, defaultColor) => {
+            this.setState({username: username, color: defaultColor});
         });
 
         this.socket.on("other users' names", allUsers => {
@@ -66,7 +67,7 @@ class ChatApp extends Component {
         return (
             <div className="container">
                 <MessageArea username={this.state.username} messages={this.state.messages} onMessage={(msg) => this.handleSendingMessages(msg)}/>
-                <OnlineUsers username={this.state.username} otherUsers={this.state.otherUsers}/>
+                <OnlineUsers username={this.state.username} color={this.state.color} otherUsers={this.state.otherUsers}/>
             </div>
         );
     }

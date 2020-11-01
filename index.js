@@ -9,11 +9,12 @@ function getTimeStamp() {
 }
 
 // usernames of all users. structure --> {socketRef, username, color}
-let allUsers = [];
+const allUsers = [];
 let userCount = 0;
+const defaultColor = "FFFFFF";
 function getUserName(socket) {
     const username = "User" + userCount++;
-    allUsers.push({socketRef: socket, username: username, color: "FFFFFF"});
+    allUsers.push({socketRef: socket, username: username, color: "FF0000"});
     console.table(allUsers);
     return username;
 }
@@ -23,7 +24,7 @@ io.on("connection", socket => {
     console.log("a user connected");
 
     // handle giving user a unique username
-    socket.emit("own username", getUserName(socket));
+    socket.emit("own username", getUserName(socket), defaultColor);
     
     // handle giving socket list of all connected users
     socket.emit("other users' names", removeSocketRefFromAllUsers());
