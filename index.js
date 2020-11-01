@@ -35,12 +35,21 @@ io.on("connection", socket => {
         socket.emit("chat message", sendChatLog());
     });
 
-    // handle user changing his color
+    // handle user changing their color
     socket.on("change color", color => {
         if (isValidHexColor(color)){
             changeColor(socket, color);
             socket.emit("change own color", color, sendChatLog());
             socket.broadcast.emit("change color", sendChatLog(), sendAllUsers());
+        }
+    });
+
+    // handle user changing their username
+    socket.on("change username", username => {
+        if (isUniqueUsername(username)) {
+            updateUsernames(socket, username);
+            socket.emit("change own username", username, sendChatLog());
+            socket.broadcast.emit("change username", sendChatLog(), sendAllUsers());
         }
     });
 
@@ -93,6 +102,22 @@ function changeColor(socket, color) {
     chatLog.map(entry => {
         if (entry.socketRef === socket) {
             entry.color = color;
+        }
+    });
+}
+
+function isUniqueUsername(username) {
+    if (allUsers.find(user => user.username === username))
+        return false;
+    return true;
+}
+function updateUsernames(socket, username) {
+    const indexToUpdate = allUsers.findIndex(user => user.socketRef === socket);
+    allUsers[indexToUpdate].username = username;
+
+    chatLog.map(entry => {
+        if (entry.socketRef === socket) {
+            entry.username = username;
         }
     });
 }

@@ -41,7 +41,16 @@ class ChatApp extends Component {
         this.socket.on("change color", (chatLog, allUsers) => {
             const otherUsers = this.filterAllUsers(allUsers);
             this.setState({messages: chatLog, otherUsers: otherUsers});
-        })
+        });
+
+        this.socket.on("change own username", (color, chatLog) => {
+            this.setState({messages: chatLog, color: color});
+        });
+
+        this.socket.on("change username", (chatLog, allUsers) => {
+            const otherUsers = this.filterAllUsers(allUsers);
+            this.setState({messages: chatLog, otherUsers: otherUsers});
+        });
     }
 
     componentWillUnmount() {
@@ -61,18 +70,26 @@ class ChatApp extends Component {
             if (this.isColorCommand(message)) {
                 this.socket.emit("change color", message.split(" ")[1])
             }
+            else if (this.isUsernameChangeCommand(message)) {
+                this.socket.emit("change username", message.slice(7, message.length-1));
+            }
             else {
                 this.socket.emit("chat message", message, this.state.username, this.state.color);
             }
         }
     }
 
-    // check for commands + handle commands
     isColorCommand(message) {
         const commandString = message.split(" ");
         if (commandString.length === 2 && commandString[0].slice(0, 6) === "/color")
             return true;
         return false; 
+    }
+
+    isUsernameChangeCommand(message) {
+        if (message.slice(0, 5) === "/name" && message.slice(6, 7) === "<" && message.slice(message.length-1) === ">")
+            return true;
+        return false;
     }
     
     render() {
