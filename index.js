@@ -38,12 +38,9 @@ io.on("connection", socket => {
         socket.broadcast.emit("chat message", {
             chatMessage: socketMsg, timestamp: getTimeStamp(), username: username, color: color
         });
-    });
-
-    // handle giving user's own message a timestamp
-    socket.on("single timestamp", (usersMessage) => {
-        console.log("Single timestamp reached")
-        socket.emit("single timestamp", getTimeStamp(), usersMessage);
+        socket.emit("chat message", {
+            chatMessage: socketMsg, timestamp: getTimeStamp(), username: username, color: color
+        });
     });
 
     socket.on("disconnect", () => {

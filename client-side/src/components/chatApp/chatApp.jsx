@@ -35,14 +35,6 @@ class ChatApp extends Component {
             messageArray.push(socketMsg);
             this.setState({messages: messageArray});
         });
-
-        this.socket.on("single timestamp", (timeStamp, usersMessage) => {
-            console.log("Single timestamp recieved");
-            const messageArray = this.state.messages;
-            messageArray.push({chatMessage: usersMessage, timestamp: timeStamp, username: this.state.username, color: this.state.color});
-            console.log(messageArray)
-            this.setState({messages: messageArray});
-        });
     }
 
     componentWillUnmount() {
@@ -58,8 +50,7 @@ class ChatApp extends Component {
     handleSendingMessages(message) {
         console.log("Action Recognized --> ", message)
         if (message) {
-            this.socket.emit("single timestamp", message, this.state.username);
-            this.socket.emit("chat message", message, this.state.username);
+            this.socket.emit("chat message", message, this.state.username, this.state.color);
         }
     }
     
