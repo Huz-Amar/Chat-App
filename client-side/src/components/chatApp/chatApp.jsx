@@ -24,7 +24,7 @@ class ChatApp extends Component {
         });
 
         this.socket.on("other users' names", allUsers => {
-            const otherUsers = allUsers.filter(user => user !== this.state.username);
+            const otherUsers = this.filterAllUsers(allUsers);
             this.setState({otherUsers: otherUsers});
         });
         
@@ -46,6 +46,11 @@ class ChatApp extends Component {
 
     componentWillUnmount() {
         this.socket.close();
+    }
+
+    // filters incoming user data
+    filterAllUsers(allUsers) {
+        return allUsers.filter(user => user.username !== this.state.username);
     }
 
     // responsible for sending messages to server

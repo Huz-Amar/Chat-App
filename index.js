@@ -26,10 +26,10 @@ io.on("connection", socket => {
     socket.emit("own username", getUserName(socket));
     
     // handle giving socket list of all connected users
-    socket.emit("other users' names", allUsers.map(user => delete user.socketRef));
+    socket.emit("other users' names", removeSocketRefFromAllUsers());
 
     // handle giving all other sockets list of all users
-    socket.broadcast.emit("other users' names", allUsers.map(user => delete user.socketRef));
+    socket.broadcast.emit("other users' names", removeSocketRefFromAllUsers());
 
     // handle chat messages from users
     socket.on("chat message", (socketMsg, username) => {
@@ -49,13 +49,20 @@ io.on("connection", socket => {
         console.log("user has disconnected");
         const indexToRemove = allUsers.findIndex(user => user.socketRef === socket);
         allUsers.splice(indexToRemove, 1);
-        socket.broadcast.emit("other users' names", allUsers.map(user => delete user.socketRef));
+        socket.broadcast.emit("other users' names", removeSocketRefFromAllUsers());
     });
 });
-
 
 
 http.listen(5000, () => {
     console.log("listening on *:5000")
 });
 
+//-----------------------------------
+// Helper Functions
+
+function removeSocketRefFromAllUsers() {
+    return allUsers.map(user => {
+        return {username: user.username, color: user.color}
+    })
+}
