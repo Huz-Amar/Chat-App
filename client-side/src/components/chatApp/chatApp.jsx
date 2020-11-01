@@ -8,7 +8,7 @@ class ChatApp extends Component {
     constructor() {
         super();
         this.state = {
-            // structure --> {chatMessage, timestamp, username}
+            // structure --> {message, timestamp, username, color}
             messages: [],
             username: "",
             color: "",
@@ -29,11 +29,9 @@ class ChatApp extends Component {
             this.setState({otherUsers: otherUsers});
         });
         
-        this.socket.on("chat message", socketMsg => {
-            console.log("Message recieved: ", socketMsg)
-            const messageArray = this.state.messages;
-            messageArray.push(socketMsg);
-            this.setState({messages: messageArray});
+        this.socket.on("chat message", chatLog => {
+            console.log("Message recieved: ", chatLog)
+            this.setState({messages: chatLog});
         });
 
         this.socket.on("change own color", color => {
@@ -47,6 +45,7 @@ class ChatApp extends Component {
     }
 
     componentWillUnmount() {
+        // manually close it just in case
         this.socket.close();
     }
 
