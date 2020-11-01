@@ -34,13 +34,13 @@ class ChatApp extends Component {
             this.setState({messages: chatLog});
         });
 
-        this.socket.on("change own color", color => {
-            this.setState({color: color});
+        this.socket.on("change own color", (color, chatLog) => {
+            this.setState({messages: chatLog, color: color});
         });
 
-        this.socket.on("change color", allUsers => {
+        this.socket.on("change color", (chatLog, allUsers) => {
             const otherUsers = this.filterAllUsers(allUsers);
-            this.setState({otherUsers: otherUsers});
+            this.setState({messages: chatLog, otherUsers: otherUsers});
         })
     }
 

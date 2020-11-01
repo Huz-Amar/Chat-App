@@ -19,25 +19,28 @@ io.on("connection", socket => {
     socket.emit("own username", getUserName(socket), defaultColor);
     
     // handle giving socket list of all connected users (upon first connect)
-    socket.emit("other users' names", removeSocketRefFromAllUsers());
+    socket.emit("other users' names", sendAllUsers());
 
     // handle giving all other sockets list of all users (upon first connect)
-    socket.broadcast.emit("other users' names", removeSocketRefFromAllUsers());
+    socket.broadcast.emit("other users' names", sendAllUsers());
+
+    // handle giving users the entire chatLog
+    socket.emit("chat message", sendChatLog());
 
     // handle chat messages from users
     socket.on("chat message", (socketMsg, username, color) => {
         console.log("message: " +  socketMsg);
         addMessageToChatLog(socket, socketMsg, username, color);
-        socket.broadcast.emit("chat message", removeSocketRefFromChatLog());
-        socket.emit("chat message", removeSocketRefFromChatLog());
+        socket.broadcast.emit("chat message", sendChatLog());
+        socket.emit("chat message", sendChatLog());
     });
 
     // handle user changing his color
     socket.on("change color", color => {
         if (isValidHexColor(color)){
             changeColor(socket, color);
-            socket.emit("change own color", color)
-            socket.broadcast.emit("change color", removeSocketRefFromAllUsers());
+            socket.emit("change own color", color, sendChatLog());
+            socket.broadcast.emit("change color", sendChatLog(), sendAllUsers());
         }
     });
 
@@ -45,7 +48,7 @@ io.on("connection", socket => {
         console.log("user has disconnected");
         const indexToRemove = allUsers.findIndex(user => user.socketRef === socket);
         allUsers.splice(indexToRemove, 1);
-        socket.broadcast.emit("other users' names", removeSocketRefFromAllUsers());
+        socket.broadcast.emit("other users' names", sendAllUsers());
     });
 });
 
@@ -64,13 +67,15 @@ function getUserName(socket) {
     return username;
 }
 
-function removeSocketRefFromAllUsers() {
+// send allUsers array, but without the socketRef (dont want client to meddle with that)
+function sendAllUsers() {
     return allUsers.map(user => {
         return {username: user.username, color: user.color}
     })
 }
 
-function removeSocketRefFromChatLog() {
+// send chatLog array, but without the socketRef (dont want client to meddle with that)
+function sendChatLog() {
     return chatLog.map(entry => {
         return {message: entry.message, timestamp: entry.timestamp, username: entry.username, color: entry.color}
     })
@@ -84,6 +89,12 @@ function isValidHexColor(color) {
 function changeColor(socket, color) {
     const indexToUpdate = allUsers.findIndex(user => user.socketRef === socket);
     allUsers[indexToUpdate].color = color;
+    
+    chatLog.map(entry => {
+        if (entry.socketRef === socket) {
+            entry.color = color;
+        }
+    });
 }
 
 function getTimeStamp() {
