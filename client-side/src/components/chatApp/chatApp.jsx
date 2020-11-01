@@ -35,6 +35,15 @@ class ChatApp extends Component {
             messageArray.push(socketMsg);
             this.setState({messages: messageArray});
         });
+
+        this.socket.on("change own color", color => {
+            this.setState({color: color});
+        });
+
+        this.socket.on("change color", allUsers => {
+            const otherUsers = this.filterAllUsers(allUsers);
+            this.setState({otherUsers: otherUsers});
+        })
     }
 
     componentWillUnmount() {
@@ -50,8 +59,21 @@ class ChatApp extends Component {
     handleSendingMessages(message) {
         console.log("Action Recognized --> ", message)
         if (message) {
-            this.socket.emit("chat message", message, this.state.username, this.state.color);
+            if (this.isColorCommand(message)) {
+                this.socket.emit("change color", message.split(" ")[1])
+            }
+            else {
+                this.socket.emit("chat message", message, this.state.username, this.state.color);
+            }
         }
+    }
+
+    // check for commands + handle commands
+    isColorCommand(message) {
+        const commandString = message.split(" ");
+        if (commandString.length === 2 && commandString[0].slice(0, 6) === "/color")
+            return true;
+        return false; 
     }
     
     render() {

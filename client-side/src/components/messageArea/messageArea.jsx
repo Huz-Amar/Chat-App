@@ -4,9 +4,9 @@ import $ from "jquery";
 
 class MessageArea extends Component {
     getUserMessage() {
-        const userMessage = $("#user_msg").val();
+        const userMsg = $("#user_msg").val();
         $("#user_msg").val("");
-        return userMessage;
+        return userMsg;
     }
 
     render() { 
