@@ -14,7 +14,7 @@ class MessageArea extends Component {
             <div className="message-area"> 
                 <div className="message-area-group-list"> 
                     <ul id="list-group">
-                        {this.props.messages.map(message => <li key={message.chatMessage} className="list-group-item">{message.timestamp}  {message.chatMessage}</li>)}
+                        {this.props.messages.map(message => <li key={message.chatMessage} className="list-group-item">{message.timestamp} {message.username}  {message.chatMessage}</li>)}
                     </ul>
                 </div>
                 <div className="message-area-form">
