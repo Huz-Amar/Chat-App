@@ -8,14 +8,21 @@ class ChatApp extends Component {
     constructor() {
         super();
         this.state = {
-            // array of objects as follows:
-            //{chatMessage, timestamp}
-            messages: []
+            // structure --> {chatMessage, timestamp}
+            messages: [],
+            username: "",
+            otherUsers: []
         }
     }
 
     componentDidMount() {
         this.socket = socketIOClient();
+
+        this.socket.on("usernames", (username, otherUsers) => {
+            let otherUsers_Usernames = otherUsers.map(user => user.username);
+            console.log(username);
+            this.setState({username: username, otherUsers: otherUsers_Usernames});
+        });
         
         this.socket.on("chat message", socketMsg => {
             console.log("Message recieved: ", socketMsg)
@@ -33,7 +40,8 @@ class ChatApp extends Component {
     }
 
     componentWillUnmount() {
-        this.socket.close();
+        console.log("About to close")
+        // this.socket.close();
     }
 
     // responsible for sending messages to server
@@ -49,7 +57,7 @@ class ChatApp extends Component {
         return (
             <div className="container">
                 <MessageArea messages={this.state.messages} onMessage={(msg) => this.handleSendingMessages(msg)}/>
-                <OnlineUsers/>
+                <OnlineUsers username={this.state.username} otherUsers={this.state.otherUsers}/>
             </div>
         );
     }
