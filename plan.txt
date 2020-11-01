@@ -1,0 +1,12 @@
+Features Left:
+-Scroll-Up Text --> Last
+
+-Chat Log --> Needed for the other parts, so high priority. use a struct similar to allUsers. will need to change up the older sockets too
+
+-Change Username+Color --> must update both user list and msg area
+
+-Bold Msgs --> should be easy, just the users own msgs are bolded in the h4 tag. last priority
+
+-Cookies --> will need to do reserach
+
+Emoji --> best to handle these within the chatApp (clientside) not server side
