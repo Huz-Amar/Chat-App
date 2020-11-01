@@ -16,7 +16,7 @@ class MessageArea extends Component {
                     <ul id="list-group">
                         {this.props.messages.map(message => 
                             <li key={message.username} className="list-group-item" >
-                                {message.timestamp} <span key={message.username} style={{color: "#" + message.color}}>{message.username}</span> {message.chatMessage}</li>)
+                                {message.timestamp} <span key={message.username} style={{color: "#" + message.color}}>{message.username}</span> {message.message}</li>)
                         }
                     </ul>
                 </div>
