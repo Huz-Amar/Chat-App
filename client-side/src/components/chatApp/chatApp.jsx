@@ -18,8 +18,13 @@ class ChatApp extends Component {
     componentDidMount() {
         this.socket = socketIOClient();
 
-        this.socket.on("usernames", (username) => {
+        this.socket.on("own username", username => {
             this.setState({username: username});
+        });
+
+        this.socket.on("other users' names", allUsers => {
+            const otherUsers = allUsers.filter(user => user !== this.state.username);
+            this.setState({otherUsers: otherUsers});
         });
         
         this.socket.on("chat message", socketMsg => {

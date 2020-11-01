@@ -11,9 +11,10 @@ function getTimeStamp() {
 // usernames. structure --> {socketRef, username}
 let allUsers = [];
 let userCount = 0;
-function getUserName() {
+function getUserName(socket) {
     const username = "User" + userCount++;
-    allUsers.push(username);
+    allUsers.push({socketRef: socket, username: username});
+    console.table(allUsers);
     return username;
 }
 
@@ -21,8 +22,14 @@ function getUserName() {
 io.on("connection", socket => {
     console.log("a user connected");
 
-    // handle giving user a unique username, and all other users
-    socket.emit("usernames", getUserName());
+    // handle giving user a unique username
+    socket.emit("own username", getUserName(socket));
+    
+    // handle giving socket list of all connected users
+    socket.emit("other users' names", allUsers.map(user => user.username));
+
+    // handle giving all other sockets list of all users
+    socket.broadcast.emit("other users' names", allUsers.map(user => user.username))
 
     // handle chat messages from users
     socket.on("chat message", (socketMsg, username) => {
@@ -40,8 +47,13 @@ io.on("connection", socket => {
 
     socket.on("disconnect", () => {
         console.log("user has disconnected");
+        const indexToRemove = allUsers.findIndex(user => user.socketRef === socket);
+        allUsers.splice(indexToRemove, 1);
+        socket.broadcast.emit("other users' names", allUsers.map(user => user.username))
     });
 });
+
+
 
 http.listen(5000, () => {
     console.log("listening on *:5000")
