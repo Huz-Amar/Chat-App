@@ -10,13 +10,16 @@ class MessageArea extends Component {
     }
 
     render() { 
+        let countForMsg = 0;
+        let countForUsername = 0;
+
         return (  
             <div className="message-area"> 
                 <div className="message-area-group-list"> 
                     <ul id="list-group">
                         {this.props.messages.map(message => 
-                            <li key={message.username} className="list-group-item" >
-                                {message.timestamp} <span key={message.username} style={{color: "#" + message.color}}>{message.username}</span> {message.message}</li>)
+                            <li key={countForMsg} className="list-group-item" >
+                                {message.timestamp} <span key={countForUsername++} style={{color: "#" + message.color}}>{message.username}</span> {message.message}</li>)
                         }
                     </ul>
                 </div>

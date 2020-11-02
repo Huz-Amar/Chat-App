@@ -43,11 +43,13 @@ class ChatApp extends Component {
             this.setState({messages: chatLog, otherUsers: otherUsers});
         });
 
-        this.socket.on("change own username", (color, chatLog) => {
-            this.setState({messages: chatLog, color: color});
+        this.socket.on("change own username", (username, chatLog) => {
+            console.table(this.state.messages);
+            this.setState({messages: chatLog, username: username});
+            console.table(this.state.messages);
         });
 
-        this.socket.on("change username", (chatLog, allUsers) => {
+        this.socket.on("change usernames", (chatLog, allUsers) => {
             const otherUsers = this.filterAllUsers(allUsers);
             this.setState({messages: chatLog, otherUsers: otherUsers});
         });
@@ -95,7 +97,7 @@ class ChatApp extends Component {
     render() {
         return (
             <div className="container">
-                <MessageArea username={this.state.username} messages={this.state.messages} onMessage={(msg) => this.handleSendingMessages(msg)}/>
+                <MessageArea messages={this.state.messages} onMessage={(msg) => this.handleSendingMessages(msg)}/>
                 <OnlineUsers username={this.state.username} color={this.state.color} otherUsers={this.state.otherUsers}/>
             </div>
         );

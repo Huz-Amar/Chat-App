@@ -49,7 +49,7 @@ io.on("connection", socket => {
         if (isUniqueUsername(username)) {
             updateUsernames(socket, username);
             socket.emit("change own username", username, sendChatLog());
-            socket.broadcast.emit("change username", sendChatLog(), sendAllUsers());
+            socket.broadcast.emit("change usernames", sendChatLog(), sendAllUsers());
         }
     });
 
@@ -114,12 +114,13 @@ function isUniqueUsername(username) {
 function updateUsernames(socket, username) {
     const indexToUpdate = allUsers.findIndex(user => user.socketRef === socket);
     allUsers[indexToUpdate].username = username;
-
+    console.table(chatLog);
     chatLog.map(entry => {
         if (entry.socketRef === socket) {
             entry.username = username;
         }
     });
+    console.table(chatLog);
 }
 
 function getTimeStamp() {
