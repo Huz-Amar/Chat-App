@@ -125,7 +125,7 @@ function updateUsernames(socket, username) {
 
 function getTimeStamp() {
     const date = new Date();
-    return (date.getDay() + "/" + date.getMonth() + "/" + date.getFullYear() + "-" +  date.getHours() + ":" + date.getMinutes());
+    return (date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear() + "-" +  date.getHours() + ":" + date.getMinutes());
 }
 
 function addMessageToChatLog(socket, msg, username, color) {
