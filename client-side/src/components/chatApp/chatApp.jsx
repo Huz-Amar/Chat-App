@@ -97,7 +97,7 @@ class ChatApp extends Component {
     render() {
         return (
             <div className="container">
-                <MessageArea messages={this.state.messages} onMessage={(msg) => this.handleSendingMessages(msg)}/>
+                <MessageArea username={this.state.username} messages={this.state.messages} onMessage={(msg) => this.handleSendingMessages(msg)}/>
                 <OnlineUsers username={this.state.username} color={this.state.color} otherUsers={this.state.otherUsers}/>
             </div>
         );
