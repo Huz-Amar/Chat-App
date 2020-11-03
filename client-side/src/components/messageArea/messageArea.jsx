@@ -18,6 +18,14 @@ class MessageArea extends Component {
         }
     }
 
+    injectEmojis(message){
+        for (let i = 0; i < this.props.emojiList.length; i++) {
+            const emojiEntry = this.props.emojiList[i];
+            message = message.replaceAll(emojiEntry.emoji, String.fromCodePoint(emojiEntry.decimalCode));
+        }
+        return message;
+    }
+
     render() { 
         let countForMsg = 0;
         let countForUsername = 0;
@@ -27,10 +35,10 @@ class MessageArea extends Component {
                 <div className="message-area-group-list"> 
                     <ul id="list-group">
                         {this.props.messages.map(message =>  
-                            <li key={countForMsg} className="list-group-item">
+                            <li key={countForMsg++} className="list-group-item">
                                 {message.timestamp} {" "}
                                 <span key={countForUsername++} style={{color: "#" + message.color}}>{message.username}</span> {" "}
-                                {this.makeOwnMessagesBold(message.username, message.message)}
+                                {this.makeOwnMessagesBold(message.username, this.injectEmojis(message.message))}
                             </li>
                         )}
                     </ul>

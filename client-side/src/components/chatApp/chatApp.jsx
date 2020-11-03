@@ -13,7 +13,11 @@ class ChatApp extends Component {
             username: "",
             color: "",
             // structure --> {username, color}
-            otherUsers: []
+            otherUsers: [],
+            // list of all emojis the ChatApp can understand
+            emojiList: [
+                { emoji: ":)", decimalCode: 128512}, { emoji: ":(", decimalCode: 128577}, {emoji: ":o", decimalCode: 128558}, {emoji: ":O", decimalCode: 128558}
+            ]
         }
     }
 
@@ -76,6 +80,7 @@ class ChatApp extends Component {
                 this.socket.emit("change username", message.slice(7, message.length-1));
             }
             else {
+                console.log("Message from client --> ", message)
                 this.socket.emit("chat message", message, this.state.username, this.state.color);
             }
         }
@@ -97,7 +102,7 @@ class ChatApp extends Component {
     render() {
         return (
             <div className="container">
-                <MessageArea username={this.state.username} messages={this.state.messages} onMessage={(msg) => this.handleSendingMessages(msg)}/>
+                <MessageArea username={this.state.username} messages={this.state.messages} onMessage={(msg) => this.handleSendingMessages(msg)} emojiList={this.state.emojiList}/>
                 <OnlineUsers username={this.state.username} color={this.state.color} otherUsers={this.state.otherUsers}/>
             </div>
         );
