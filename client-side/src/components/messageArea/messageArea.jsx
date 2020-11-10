@@ -9,7 +9,7 @@ class MessageArea extends Component {
         return userMsg;
     }
 
-    makeOwnMessagesBold(username, message) {
+    boldOwnMessages(username, message) {
         if (username === this.props.username) {
             return <b>{message}</b>;
         }
@@ -38,7 +38,7 @@ class MessageArea extends Component {
                             <li key={countForMsg++} className="list-group-item">
                                 {message.timestamp} {" "}
                                 <span key={countForUsername++} style={{color: "#" + message.color}}>{message.username}</span> {" "}
-                                {this.makeOwnMessagesBold(message.username, this.injectEmojis(message.message))}
+                                {this.boldOwnMessages(message.username, this.injectEmojis(message.message))}
                             </li>
                         )}
                     </ul>

@@ -21,10 +21,37 @@ class ChatApp extends Component {
         }
     }
 
+    setCookies(socketID) {
+        document.cookie = "trial=trial";
+        let cookies = document.cookie.split(";");
+        // clear all non-socketID cookies first
+        for (let i = 0; i < cookies.length; i++) {
+            let cookie = cookies[i];
+            if (!cookie.includes("socketID=")) {
+                let eqPos = cookie.indexOf("=");
+                let name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
+                document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
+            }
+        }
+        document.cookie = `socketID=${socketID};expires=${new Date(2021, 0, 1).toUTCString()}`;
+    }
+
     componentDidMount() {
         this.socket = socketIOClient();
+        
+        this.socket.on("connect", () => {
+            // document.cookie = `socketID: ${this.socket.id}`
+            this.socket.emit("cookie", this.socket.id)
+        });
+
+        // this.socket.on("cookie", socketID => {
+        //     this.setCookies(socketID)
+        //     this.socket.emit("cookie", document.cookie);
+        // });
 
         this.socket.on("own username", (username, defaultColor) => {
+            // document.cookie = `username=${username}`; 
+            // console.log(document.cookie)
             this.setState({username: username, color: defaultColor});
         });
 
@@ -60,7 +87,7 @@ class ChatApp extends Component {
     }
 
     componentWillUnmount() {
-        // manually close it just in case
+        // manually close it just in case (though it doesnt really appear to do anything)
         this.socket.close();
     }
 
