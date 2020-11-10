@@ -12,3 +12,10 @@ Features Left:
 Emoji --> best to handle these within the chatApp (clientside) not server side
 
 Minor --> give componets proper keys
+
+-----------------------------------------------------
+
+Good News! We can create a unique sessionID identifier, pass THAT to client, and set that to its cookie, IF it doesnt have sessionID already
+then we retrieve it on server side. this way we can load in info
+
+also, pls make cookie on server side.

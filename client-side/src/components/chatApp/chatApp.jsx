@@ -24,6 +24,25 @@ class ChatApp extends Component {
     componentDidMount() {
         this.socket = socketIOClient();
 
+        // this.socket.emit("cookie", document.cookie);
+        this.socket.on("connect", () => {
+            this.socket.emit("cookie", document.cookie.split(";")[0].split("=")[1]);
+        });
+
+        this.socket.on("cookie", sessionID => {
+            let cookieAdded;
+            if (document.cookie.split(";")[0].indexOf("sessionID=") !== -1) {
+                console.log("Client already has socketID cookie")
+                cookieAdded = false;
+            }
+            else {
+                console.log("Making new sessionID cookie")
+                document.cookie = `sessionID=${sessionID};expires=${new Date(2021, 0, 1).toUTCString()}`
+                cookieAdded = true;
+            }
+            this.socket.emit("increment session count", cookieAdded);
+        });
+
         this.socket.on("own username", (username, defaultColor) => {
             this.setState({username: username, color: defaultColor});
         });
