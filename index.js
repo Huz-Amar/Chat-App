@@ -12,12 +12,10 @@ const chatLog = [];
 let userCount = 0;
 const defaultColor = "FFFFFF";
 
-let sessionID = 0;
+let sessionID = 1000;
 
 // socket operations
 io.on("connection", socket => {
-    console.log("a user connected. displaying all users throughout history: ", usersConnectedThroughoutHistory);
-
     // see if socket connection previously was connected
     // usersConnectedThroughoutHistory.find(entry => entry)
 
@@ -34,28 +32,32 @@ io.on("connection", socket => {
     socket.emit("chat message", sendChatLog());
 
     // handle giving client their cookie
-    socket.emit("cookie", sessionID);
+    // socket.emit("cookie", sessionID);
 
-    // handle clien'ts responce to the cookie emit command
-    socket.on("increment session count", cookieAdded => {
-        if(cookieAdded) {
-            sessionID++;
-            usersConnectedThroughoutHistory.push({sessionID: sessionID, socketRef: socket.id})
-            console.log("new User added")
-        }
-        console.log("Current list of all users throughout server history: ", usersConnectedThroughoutHistory)
-    });
+    // // handle client's responce to the cookie emit command
+    // socket.on("increment session count", cookieAdded => {
+    //     if(cookieAdded) {
+    //         sessionID++;
+    //         usersConnectedThroughoutHistory.push({sessionID: sessionID, socketRef: socket.id})
+    //         console.log("new User added")
+    //     }
+    //     console.log("Current list of all users throughout server history: ", usersConnectedThroughoutHistory)
+    // });
 
-    socket.on("cookie", sessionID => {
-        console.log(sessionID)
-        const value = usersConnectedThroughoutHistory.find(entry => entry.sessionID === sessionID);
+    socket.on("give cookie to server", clientSessionID => {
+        console.log(clientSessionID)
+        const value = usersConnectedThroughoutHistory.find(entry => entry.sessionID === clientSessionID);
         if (value) {
-            console.log("User tha connected joined previously");
+            console.log("User that connected previously joined");
             console.log(value)
         }
         else {
             console.log("Brand new user joined")
             usersConnectedThroughoutHistory.push({sessionID: sessionID, socketRef: socket.id});
+            socket.emit("set cookie on client", sessionID);
+            sessionID++;
+            console.log("SessionID of the Server is now " , sessionID)
+            console.log("displaying all users throughout history: ", usersConnectedThroughoutHistory);
         }
     });
 
@@ -104,7 +106,7 @@ http.listen(5000, () => {
 function getUserName(socket) {
     const username = "User" + userCount++;
     connectedUsers.push({socketRef: socket.id, username: username, color: defaultColor});
-    console.table(connectedUsers);
+    // console.table(connectedUsers);
     return username;
 }
 

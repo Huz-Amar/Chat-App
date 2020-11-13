@@ -25,23 +25,26 @@ class ChatApp extends Component {
         this.socket = socketIOClient();
 
         // this.socket.emit("cookie", document.cookie);
-        this.socket.on("connect", () => {
-            this.socket.emit("cookie", document.cookie.split(";")[0].split("=")[1]);
+
+        this.socket.emit("give cookie to server", this.getSessionIDCookie());
+
+        this.socket.on("set cookie on client", sessionIDToSet => {
+            document.cookie = `sessionID=${sessionIDToSet};max-age=31536000;path=/`
         });
 
-        this.socket.on("cookie", sessionID => {
-            let cookieAdded;
-            if (document.cookie.split(";")[0].indexOf("sessionID=") !== -1) {
-                console.log("Client already has socketID cookie")
-                cookieAdded = false;
-            }
-            else {
-                console.log("Making new sessionID cookie")
-                document.cookie = `sessionID=${sessionID};expires=${new Date(2021, 0, 1).toUTCString()}`
-                cookieAdded = true;
-            }
-            this.socket.emit("increment session count", cookieAdded);
-        });
+        // this.socket.on("cookie", sessionID => {
+        //     let cookieAdded;
+        //     if (document.cookie.split(";")[0].indexOf("sessionID=") !== -1) {
+        //         console.log("Client already has socketID cookie")
+        //         cookieAdded = false;
+        //     }
+        //     else {
+        //         console.log("Making new sessionID cookie")
+        //         document.cookie = `sessionID=${sessionID};expires=${new Date(2021, 0, 1).toUTCString()}`
+        //         cookieAdded = true;
+        //     }
+        //     this.socket.emit("increment session count", cookieAdded);
+        // });
 
         this.socket.on("own username", (username, defaultColor) => {
             this.setState({username: username, color: defaultColor});
@@ -81,6 +84,22 @@ class ChatApp extends Component {
     componentWillUnmount() {
         // manually close it just in case
         this.socket.close();
+    }
+
+    // handles sending sessionID cookie to server (if the client has it)
+    getSessionIDCookie(){
+        const cookies = document.cookie.split(";");
+        const sessionIDIndex = cookies.findIndex(cookie => cookie.includes("sessionID="))
+        console.log(sessionIDIndex)
+        if (sessionIDIndex !== -1) {
+            const sessionID = parseInt(cookies[sessionIDIndex].split("=")[1]);
+            if (isNaN(sessionID))
+                return null 
+            return sessionID
+        }
+        else {
+            return null;
+        }
     }
 
     // filters incoming user data to exclude own
