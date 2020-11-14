@@ -35,11 +35,13 @@ class MessageArea extends Component {
                 <div className="message-area-group-list"> 
                     <ul id="list-group">
                         {this.props.messages.map(message =>  
-                            <li key={countForMsg++} className="list-group-item">
-                                {message.timestamp} {" "}
-                                <span key={countForUsername++} style={{color: "#" + message.color}}>{message.username}</span> {" "}
-                                {this.makeOwnMessagesBold(message.username, this.injectEmojis(message.message))}
-                            </li>
+                            <div>
+                                <li key={countForMsg++} className="list-group-item">
+                                    {message.timestamp} {" "}
+                                    <span key={countForUsername++} style={{color: "#" + message.color}}>{message.username}</span> {" "}
+                                    {this.makeOwnMessagesBold(message.username, this.injectEmojis(message.message))}
+                                </li>
+                            </div>
                         )}
                     </ul>
                 </div>

@@ -8,6 +8,7 @@
     height: 95%;
     overflow-y: auto;
     overflow-x: hidden;
+    float: bottom;
 }
 
 .message-area-form {
@@ -28,4 +29,13 @@
 .message-area-form button {
     /* height: 47px; */
     height: 100%;
+}
+
+#list-group {
+    display: flex;
+    flex-direction: column-reverse;
+}
+
+.list-group-item {
+    
 }
