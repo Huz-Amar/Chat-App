@@ -5,7 +5,7 @@ const io = require("socket.io")(http);
 
 // usernames of all users. structure --> {socketRef, username, color}
 const connectedUsers = [];
-// structure --> {sessionID, socketRef}
+// structure --> {sessionID, socketRef, username, color}
 const usersConnectedThroughoutHistory = [];
 // list of all msgs, max of 200. structure --> {socketRef, message, timestamp, username, color}
 const chatLog = [];
@@ -16,55 +16,55 @@ let sessionID = 1000;
 
 // socket operations
 io.on("connection", socket => {
-    // see if socket connection previously was connected
-    // usersConnectedThroughoutHistory.find(entry => entry)
-
-    // handle giving user a unique username (upon first connect)
-    socket.emit("own username", getUserName(socket), defaultColor);
-    
-    // handle giving socket list of all connected users (upon first connect)
-    socket.emit("other users' names", sendAllUsers());
-
-    // handle giving all other sockets list of all users (upon first connect)
-    socket.broadcast.emit("other users' names", sendAllUsers());
-
-    // handle giving users the entire chatLog (upon first connect)
-    socket.emit("chat message", sendChatLog());
-
-    // handle giving client their cookie
-    // socket.emit("cookie", sessionID);
-
-    // // handle client's responce to the cookie emit command
-    // socket.on("increment session count", cookieAdded => {
-    //     if(cookieAdded) {
-    //         sessionID++;
-    //         usersConnectedThroughoutHistory.push({sessionID: sessionID, socketRef: socket.id})
-    //         console.log("new User added")
-    //     }
-    //     console.log("Current list of all users throughout server history: ", usersConnectedThroughoutHistory)
-    // });
+    // the socket's ID that is to be passed to functions for organization purposes
+    // it will be properly assigned in the below functions
+    let socketID = null;
 
     socket.on("give cookie to server", clientSessionID => {
         console.log(clientSessionID)
         const value = usersConnectedThroughoutHistory.find(entry => entry.sessionID === clientSessionID);
         if (value) {
             console.log("User that connected previously joined");
-            console.log(value)
+            // console.log(value)
+            // pass user all its previous info
+            // add user back into connectedUsers
+            // pull out chatLog info (which is supposed to happen anyways)
+            // most of it should be resolved by just sending the user his username
+            const userOldUsername = value.username;
+            const userOldColor = value.color;
+            // assign socketID to the client's previous value (will result in them getting all their old info back)
+            socketID = value.socketRef;
+
+            addUserBackIn(socketID, userOldUsername, userOldColor)
+
+            socket.emit("own username", userOldUsername, userOldColor);
+            socket.emit("other users' names", sendAllUsers());
+            socket.broadcast.emit("other users' names", sendAllUsers());
+            socket.emit("chat message", sendChatLog());
         }
         else {
+            // assign socketID to the client's current socketID value 
+            socketID = socket.id;
+
             console.log("Brand new user joined")
-            usersConnectedThroughoutHistory.push({sessionID: sessionID, socketRef: socket.id});
             socket.emit("set cookie on client", sessionID);
+
+            // send new client information
+            socket.emit("own username", addNewUser(socketID), defaultColor);
+            socket.emit("other users' names", sendAllUsers());
+            socket.broadcast.emit("other users' names", sendAllUsers());
+            socket.emit("chat message", sendChatLog());
+            // console.log("displaying all users throughout history: ", usersConnectedThroughoutHistory);
+
+            // at the end of it all, increment sessionID to get it ready for the next one
             sessionID++;
-            console.log("SessionID of the Server is now " , sessionID)
-            console.log("displaying all users throughout history: ", usersConnectedThroughoutHistory);
         }
     });
 
     // handle chat messages from users
     socket.on("chat message", (socketMsg, username, color) => {
         console.log("message: " +  socketMsg);
-        addMessageToChatLog(socket, socketMsg, username, color);
+        addMessageToChatLog(socketID, socketMsg, username, color);
         socket.broadcast.emit("chat message", sendChatLog());
         socket.emit("chat message", sendChatLog());
     });
@@ -72,7 +72,7 @@ io.on("connection", socket => {
     // handle user changing their color
     socket.on("change color", color => {
         if (isValidHexColor(color)){
-            changeColor(socket, color);
+            changeColor(socketID, color);
             socket.emit("change own color", color, sendChatLog());
             socket.broadcast.emit("change color", sendChatLog(), sendAllUsers());
         }
@@ -81,15 +81,16 @@ io.on("connection", socket => {
     // handle user changing their username
     socket.on("change username", username => {
         if (isUniqueUsername(username)) {
-            updateUsernames(socket, username);
+            updateUsernames(socketID, username);
             socket.emit("change own username", username, sendChatLog());
             socket.broadcast.emit("change usernames", sendChatLog(), sendAllUsers());
         }
     });
 
     socket.on("disconnect", () => {
+        console.log("--------------------------------------------------------------------------------------")
         console.log("user has disconnected");
-        const indexToRemove = connectedUsers.findIndex(user => user.socketRef === socket);
+        const indexToRemove = connectedUsers.findIndex(user => user.socketRef === socketID);
         connectedUsers.splice(indexToRemove, 1);
         socket.broadcast.emit("other users' names", sendAllUsers());
     });
@@ -103,11 +104,16 @@ http.listen(5000, () => {
 //-----------------------------------
 // Helper Functions
 
-function getUserName(socket) {
+function addNewUser(socketID) {
     const username = "User" + userCount++;
-    connectedUsers.push({socketRef: socket.id, username: username, color: defaultColor});
+    connectedUsers.push({socketRef: socketID, username: username, color: defaultColor});
+    usersConnectedThroughoutHistory.push({sessionID: sessionID, socketRef: socketID, username: username, color: defaultColor});
     // console.table(connectedUsers);
     return username;
+}
+
+function addUserBackIn(socketID, userOldName, userOldColor) {
+    connectedUsers.push({socketRef: socketID, username: userOldName, color: userOldColor});
 }
 
 // send allUsers array, but without the socketRef (dont want client to meddle with that)
@@ -129,12 +135,18 @@ function isValidHexColor(color) {
         return true;
     return false;
 }
-function changeColor(socket, color) {
-    const indexToUpdate = connectedUsers.findIndex(user => user.socketRef === socket.id);
-    connectedUsers[indexToUpdate].color = color;
+function changeColor(socketID, color) {
+    const indexToUpdate_ConnectedUsers = connectedUsers.findIndex(user => user.socketRef === socketID);
+    // console.log("Connected Users ", connectedUsers)
+    // console.log("Respective Index ", indexToUpdate_ConnectedUsers)
+    // console.log("SocketID ", socketID)
+    connectedUsers[indexToUpdate_ConnectedUsers].color = color;
     
+    const indexToUpdate_UsersThroughoutHistory = usersConnectedThroughoutHistory.findIndex(user => user.socketRef === socketID)
+    usersConnectedThroughoutHistory[indexToUpdate_UsersThroughoutHistory].color = color;
+
     chatLog.map(entry => {
-        if (entry.socketRef === socket.id) {
+        if (entry.socketRef === socketID) {
             entry.color = color;
         }
     });
@@ -145,16 +157,18 @@ function isUniqueUsername(username) {
         return false;
     return true;
 }
-function updateUsernames(socket, username) {
-    const indexToUpdate = connectedUsers.findIndex(user => user.socketRef === socket.id);
+function updateUsernames(socketID, username) {
+    const indexToUpdate = connectedUsers.findIndex(user => user.socketRef === socketID);
     connectedUsers[indexToUpdate].username = username;
-    console.table(chatLog);
+    
+    const indexToUpdate_UsersThroughoutHistory = usersConnectedThroughoutHistory.findIndex(user => user.socketRef === socketID)
+    usersConnectedThroughoutHistory[indexToUpdate_UsersThroughoutHistory].username = username;
+    
     chatLog.map(entry => {
-        if (entry.socketRef === socket.id) {
+        if (entry.socketRef === socketID) {
             entry.username = username;
         }
     });
-    console.table(chatLog);
 }
 
 function getTimeStamp() {
@@ -162,7 +176,7 @@ function getTimeStamp() {
     return (date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear() + "-" +  date.getHours() + ":" + date.getMinutes());
 }
 
-function addMessageToChatLog(socket, msg, username, color) {
+function addMessageToChatLog(socketID, msg, username, color) {
     if (chatLog.length === 200) chatLog.splice(0, 1);
-    chatLog.push({socketRef: socket.id, message: msg, timestamp: getTimeStamp(), username: username, color: color})
+    chatLog.push({socketRef: socketID, message: msg, timestamp: getTimeStamp(), username: username, color: color})
 }
