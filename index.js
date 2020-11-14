@@ -25,11 +25,6 @@ io.on("connection", socket => {
         const value = usersConnectedThroughoutHistory.find(entry => entry.sessionID === clientSessionID);
         if (value) {
             console.log("User that connected previously joined");
-            // console.log(value)
-            // pass user all its previous info
-            // add user back into connectedUsers
-            // pull out chatLog info (which is supposed to happen anyways)
-            // most of it should be resolved by just sending the user his username
             const userOldUsername = value.username;
             const userOldColor = value.color;
             // assign socketID to the client's previous value (will result in them getting all their old info back)
