@@ -10,6 +10,7 @@ class MessageArea extends Component {
     }
 
     makeOwnMessagesBold(username, message) {
+        console.log("Make Own messages bold")
         if (username === this.props.username) {
             return <b>{message}</b>;
         }
@@ -26,6 +27,12 @@ class MessageArea extends Component {
         return message;
     }
 
+    scrollToBottom(){
+        console.log("Scroll to Bottom Hit")
+        const messageArea = $(".message-area-group-list");
+        messageArea.scrollTop(9999/0.0001);
+    }   
+
     render() { 
         let countForMsg = 0;
         let countForUsername = 0;
@@ -35,12 +42,12 @@ class MessageArea extends Component {
                 <div className="message-area-group-list"> 
                     <ul id="list-group">
                         {this.props.messages.map(message =>  
-                            <div>
+                            <div key={countForMsg}>
                                 <li key={countForMsg++} className="list-group-item">
                                     {message.timestamp} {" "}
                                     <span key={countForUsername++} style={{color: "#" + message.color}}>{message.username}</span> {" "}
                                     {this.makeOwnMessagesBold(message.username, this.injectEmojis(message.message))}
-                                </li>
+                                </li>   
                             </div>
                         )}
                     </ul>
@@ -49,6 +56,7 @@ class MessageArea extends Component {
                     <input id="user_msg"></input>
                     <button className="btn btn-success" id="submit" onClick={() => this.props.onMessage(this.getUserMessage())}>Send</button>
                 </div>
+                {this.scrollToBottom()}
             </div>
         );
     }

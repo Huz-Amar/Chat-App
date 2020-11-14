@@ -4,17 +4,22 @@
 }
 
 .message-area-group-list {
-    display: block;
+    /* display: block; */
+    display: flex;
+    flex-direction: column-reverse;
     height: 95%;
     overflow-y: auto;
     overflow-x: hidden;
-    float: bottom;
 }
 
 .message-area-form {
     height: 5%;
     display: grid;
     grid-template-columns: 3fr 1fr;
+}
+
+#list-group {
+    /* overflow-y: auto; */
 }
 
 .list-group-item {
@@ -29,13 +34,4 @@
 .message-area-form button {
     /* height: 47px; */
     height: 100%;
-}
-
-#list-group {
-    display: flex;
-    flex-direction: column-reverse;
-}
-
-.list-group-item {
-    
 }
